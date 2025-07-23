@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Choose Payment Method</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4a6eff;
+      --primary-dark: #3a5adf;
+      --secondary: #ff6b6b;
+      --text: #333333;
+      --text-light: #666666;
+      --background: #f5f7ff;
+      --card-bg: #ffffff;
+      --border-radius: 12px;
+      --shadow: 0 8px 20px rgba(74, 110, 255, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      padding: 40px 20px;
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: var(--text-light);
+      font-size: 15px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .section-title i {
+      margin-right: 10px;
+      color: var(--primary);
+      font-size: 20px;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .payment-option {
+      position: relative;
+    }
+
+    .payment-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .payment-option label {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #f9faff;
+      border: 2px solid #e8eeff;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .payment-option input[type="radio"]:checked + label {
+      border-color: var(--primary);
+      background: rgba(74, 110, 255, 0.05);
+    }
+
+    .payment-option label i {
+      font-size: 20px;
+      margin-right: 10px;
+      color: var(--primary);
+    }
+
+    .payment-option label span {
+      font-weight: 500;
+    }
+
+    .online-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e8eeff;
+      border-radius: var(--border-radius);
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .card-details {
+      margin-bottom: 25px;
+    }
+
+    .card-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .wallet-info {
+      background: #f9faff;
+      padding: 20px;
+      border-radius: var(--border-radius);
+      margin-bottom: 25px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .wallet-info p {
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .wallet-info p:last-child {
+      margin-bottom: 0;
+    }
+
+    .wallet-info .balance {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .trip-details {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .trip-details .divider {
+      flex: 1;
+      height: 1px;
+      background: #e8eeff;
+      margin: 0 10px;
+    }
+
+    .trip-details i {
+      color: var(--text-light);
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .btn i {
+      margin-right: 8px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .payment-options,
+      .online-options {
+        grid-template-columns: 1fr;
+      }
+
+      .card-row {
+        flex-direction: column;
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<nav style="
+  background-color: #4a6eff;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 40px;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+">
+  <div style="font-size: 20px; font-weight: 600;">
+    RideRipple
+  </div>
+  <a href="{% url 'home' %}" style="
+    background-color: white;
+    color: #4a6eff;
+    padding: 10px 18px;
+    font-weight: 500;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  " onmouseover="this.style.backgroundColor='#f0f4ff'" onmouseout="this.style.backgroundColor='white'">
+    ← Back to Dashboard
+  </a>
+</nav>
+<div class="container">
+  <div class="header">
+    <h1>Complete Your Payment</h1>
+    <p>Choose your preferred payment method to continue</p>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      <i class="fas fa-wallet"></i>
+      <span>Select Payment Method</span>
+    </div>
+
+    <div class="payment-options">
+      <div class="payment-option">
+        <input type="radio" name="payment_method" id="pay_online" value="pay_online">
+        <label for="pay_online">
+          <i class="fas fa-credit-card"></i>
+          <span>Pay Online</span>
+        </label>
+      </div>
+
+      <div class="payment-option">
+        <input type="radio" name="payment_method" id="pay_at_property" value="pay_at_property">
+        <label for="pay_at_property">
+          <i class="fas fa-store"></i>
+          <span>Pay Cash</span>
+        </label>
+      </div>
+    </div>
+
+    <div id="online_payment_options" class="hidden animate-fade-in">
+      <div class="section-title">
+        <i class="fas fa-globe"></i>
+        <span>Choose Online Payment</span>
+      </div>
+
+      <div class="online-options">
+        <div class="payment-option">
+          <input type="radio" name="online_payment_method" id="stripe" value="stripe">
+          <label for="stripe">
+            <i class="fab fa-stripe"></i>
+            <span>Credit Card</span>
+          </label>
+        </div>
+
+        <div class="payment-option">
+          <input type="radio" name="online_payment_method" id="wallet" value="wallet">
+          <label for="wallet">
+            <i class="fas fa-wallet"></i>
+            <span>Wallet</span>
+          </label>
+        </div>
+
+        <div class="payment-option">
+          <input type="radio" name="online_payment_method" id="paypal" value="paypal">
+          <label for="paypal">
+            <i class="fab fa-paypal"></i>
+            <span>Stripe</span>
+          </label>
+        </div>
+
+        <div class="payment-option">
+          <input type="radio" name="online_payment_method" id="apple_pay" value="apple_pay">
+          <label for="apple_pay">
+            <i class="fab fa-apple-pay"></i>
+            <span>Apple Pay</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="card_fields" class="hidden animate-fade-in">
+      <div class="section-title">
+        <i class="far fa-credit-card"></i>
+        <span>Card Details</span>
+      </div>
+
+      <div class="card-details">
+        <div class="form-group">
+          <label for="card_number">Card Number</label>
+          <input type="text" id="card_number" class="form-control" placeholder="XXXX XXXX XXXX XXXX">
+        </div>
+
+        <div class="card-row">
+          <div class="form-group">
+            <label for="expiry_date">Expiry Date</label>
+            <input type="month" id="expiry_date" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="cvv">CVV</label>
+            <input type="text" id="cvv" class="form-control" maxlength="3" placeholder="XXX">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="wallet_info" class="hidden animate-fade-in">
+      <div class="section-title">
+        <i class="fas fa-wallet"></i>
+        <span>Wallet Payment</span>
+      </div>
+
+      <div class="wallet-info">
+        <p class="balance">Wallet Balance: $42.50</p>
+
+        <div class="trip-details">
+          <div>
+            <i class="fas fa-map-marker-alt"></i>
+            <strong>Pickup:</strong> Times Square
+          </div>
+          <span class="divider"></span>
+          <div>
+            <i class="fas fa-map-marker"></i>
+            <strong>Dropoff:</strong> JFK Airport
+          </div>
+        </div>
+
+        <p><strong>Fare:</strong> $18.75</p>
+      </div>
+    </div>
+
+    <button type="submit" class="btn">
+      <i class="fas fa-check-circle"></i>
+      Complete Payment
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const payOnline = document.getElementById('pay_online');
+    const onlineOptions = document.getElementById('online_payment_options');
+    const cardFields = document.getElementById('card_fields');
+    const walletInfo = document.getElementById('wallet_info');
+
+    const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
+    const onlinePaymentRadios = document.querySelectorAll('input[name="online_payment_method"]');
+
+    // Show/hide payment sections
+    paymentRadios.forEach(radio => {
+      radio.addEventListener('change', function () {
+        if (this.value === 'pay_online') {
+          onlineOptions.classList.remove('hidden');
+          // Reset online payment options
+          onlinePaymentRadios.forEach(opt => opt.checked = false);
+          cardFields.classList.add('hidden');
+          walletInfo.classList.add('hidden');
+        } else {
+          onlineOptions.classList.add('hidden');
+          cardFields.classList.add('hidden');
+          walletInfo.classList.add('hidden');
+        }
+      });
+    });
+
+    // Handle online method selection
+    onlinePaymentRadios.forEach(radio => {
+      radio.addEventListener('change', function () {
+        cardFields.classList.add('hidden');
+        walletInfo.classList.add('hidden');
+
+        if (this.value === 'stripe') {
+          cardFields.classList.remove('hidden');
+        }
+
+        if (this.value === 'wallet') {
+          walletInfo.classList.remove('hidden');
+        }
+      });
+    });
+
+    // Form validation
+    document.querySelector('.btn').addEventListener('click', function(e) {
+      const paymentMethod = document.querySelector('input[name="payment_method"]:checked');
+
+      if (!paymentMethod) {
+        alert('Please select a payment method');
+        e.preventDefault();
+        return;
+      }
+
+      if (paymentMethod.value === 'pay_online') {
+        const onlineMethod = document.querySelector('input[name="online_payment_method"]:checked');
+
+        if (!onlineMethod) {
+          alert('Please select an online payment option');
+          e.preventDefault();
+          return;
+        }
+
+        if (onlineMethod.value === 'stripe') {
+          const cardNumber = document.getElementById('card_number').value;
+          const expiryDate = document.getElementById('expiry_date').value;
+          const cvv = document.getElementById('cvv').value;
+
+          if (!cardNumber || !expiryDate || !cvv) {
+            alert('Please fill in all card details');
+            e.preventDefault();
+            return;
+          }
+        }
+      }
+
+      alert('Payment confirmed! Thank you for your booking.');
+    });
+  });
+</script>
+
+</body>
+</html>

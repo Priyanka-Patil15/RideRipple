@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ride Confirmed | RideRipple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f1f1f1;
+      margin: 0;
+    }
+
+    #map {
+      height: 55vh;
+      width: 100%;
+      z-index: 0;
+    }
+
+    .card {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a73e8;
+      margin-bottom: 8px;
+    }
+
+    .detail {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .muted {
+      color: #888;
+      font-size: 13px;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        width: 420px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<div class="card">
+  <div class="title">Your {{ ride.ride_type }} is on the way</div>
+  <div class="detail">📍 Pickup: {{ ride.pickup }}</div>
+  <div class="detail">🏁 Dropoff: {{ ride.dropoff }}</div>
+  <div class="detail">⏱ Estimated arrival: 6 min</div>
+  <div class="detail">👤 Driver: Alex | 🚗 Toyota Prius | 🪪 AA 1234A</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([40.793, -74.03], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+  const route = L.polyline([
+    [40.793, -74.03],
+    [40.7812, -73.9665]
+  ], { color: '#1a73e8', weight: 4 }).addTo(map);
+
+  map.fitBounds(route.getBounds());
+</script>
+
+</body>
+</html>

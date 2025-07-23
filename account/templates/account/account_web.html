@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account | RideRipple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      margin: 0;
+      background: #f8f9fa;
+      color: #111;
+      font-size: 16px; /* increased base font */
+      height: 100vh;
+    }
+
+    nav {
+      background: #fff;
+      padding: 14px 24px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 60px;
+    }
+
+    .navbar-left {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .navbar-links a {
+      margin-right: 24px;
+      text-decoration: none;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .navbar-links a.active {
+      color: #1a73e8;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      background-color: #1a73e8;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .layout {
+      display: flex;
+      height: calc(100vh - 60px);
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #fff;
+      border-right: 1px solid #ddd;
+      padding: 20px;
+    }
+
+    .sidebar a {
+      display: block;
+      margin-bottom: 16px;
+      text-decoration: none;
+      color: #111;
+      font-size: 16px;
+    }
+
+    .sidebar a.active {
+      background-color: #e6e6e6;
+      padding: 8px;
+      border-radius: 6px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .profile {
+      text-align: center;
+    }
+
+    .profile img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: #ddd;
+      margin-bottom: 14px;
+    }
+
+    .profile h2 {
+      margin: 6px 0;
+      font-size: 22px;
+    }
+
+    .profile p {
+      color: #555;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .button-grid {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+    }
+
+    .button-grid button {
+      background: #f1f1f1;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 20px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .suggestion-box {
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .suggestion-box h4 {
+      font-size: 17px;
+      margin-bottom: 6px;
+    }
+
+    .suggestion-box p {
+      color: #555;
+      font-size: 15px;
+    }
+
+    .suggestion-box button {
+      background: #eee;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+    .action-btn {
+    background: #f1f1f1;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #111;
+    display: inline-block;
+    text-align: center;
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav>
+    <div class="navbar-left">RideRipple</div>
+    <div class="navbar-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'ride-history' %}">Rides</a>
+      <a href="{% url 'account-web' %}" class="active">Account</a>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a href="{% url 'home' %}">
+        <button type="button" class="logout-btn" style="background-color: #555;">← Dashboard</button>
+    </a>
+    <form action="{% url 'logout' %}" method="POST" style="margin: 0;">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </nav>
+
+  <!-- Layout -->
+  <div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <a href="#" class="active">Home</a>
+      <a href="#">Personal info</a>
+      <a href="#">Security</a>
+      <a href="#">Privacy & Data</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="profile">
+        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="avatar">
+        <h2>{{ user.get_full_name|default:user.username }}</h2>
+        <p>{{ user.email }}</p>
+      </div>
+
+      <div class="button-grid">
+        <a href="{% url 'account-personal-info' %}" class="action-btn">👤 Personal info</a>
+        <button>🛡️ Security</button>
+        <button>🔒 Privacy & Data</button>
+      </div>
+
+      <div class="suggestion-box">
+        <h4>Complete your account checkup</h4>
+        <p>Complete your account checkup to make RideRipple work better for you and keep your data secure.</p>
+        <button>Begin checkup</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

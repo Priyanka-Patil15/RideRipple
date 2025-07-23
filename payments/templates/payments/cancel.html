@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Cancelled | RideRipple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Uber Move', sans-serif;
+      background-color: #fef2f2;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .cancel-box {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #d93025;
+    }
+    p {
+      margin: 16px 0;
+      color: #333;
+    }
+    a {
+      background: #1a73e8;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="cancel-box">
+    <h2>Payment Cancelled</h2>
+    <p>Oops! Your payment was not completed.</p>
+    <a href="{% url 'home' %}">Try Again</a>
+  </div>
+</body>
+</html>

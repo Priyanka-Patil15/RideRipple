@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Personal Info | RideRipple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Uber Move', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: #f5f5f5;
+      color: #111;
+    }
+
+    nav {
+      background: #fff;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    .navbar-left {
+      font-weight: 600;
+      font-size: 20px;
+      color: #000;
+    }
+
+    .logout-btn {
+      background-color: #000;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 24px 48px;
+      background-color: #fff;
+      border-radius: 16px;
+    }
+
+    h2 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 32px 0 16px;
+      text-align: center;
+    }
+
+    .profile-photo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .profile-photo img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ccc;
+    }
+
+    .initials-circle {
+      width: 100px;
+      height: 100px;
+      background-color: #1a73e8;
+      color: white;
+      border-radius: 50%;
+      font-size: 32px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+    }
+
+    .change-photo {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #1a73e8;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .rating-box {
+      text-align: center;
+      padding: 16px 0;
+      border-top: 1px solid #eee;
+      border-bottom: 1px solid #eee;
+    }
+
+    .stars {
+      font-size: 22px;
+      letter-spacing: 4px;
+      color: #FFD700;
+    }
+
+    .rating-label {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      padding: 14px 16px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      background-color: #f9f9f9;
+    }
+
+    .save-btn {
+      background: #000;
+      color: white;
+      padding: 14px;
+      font-size: 15px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .back-link {
+      display: inline-block;
+      text-align: center;
+      margin: 32px auto;
+      text-decoration: none;
+      color: #1a73e8;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .message {
+      background-color: #e8f0fe;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #1a73e8;
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="navbar-left">RideRipple</div>
+    <form action="{% url 'logout' %}" method="POST">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn">Logout</button>
+    </form>
+  </nav>
+
+  <div class="container">
+    <h2>Personal Information</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="profile-photo">
+        {% if profile.photo and profile.photo.url %}
+          <img src="{{ profile.photo.url }}?v={{ timestamp }}" alt="Profile Photo">
+        {% else %}
+          <div class="initials-circle">
+            {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:''|slice:":1" }}
+          </div>
+        {% endif %}
+        <label for="photo-upload" class="change-photo">Change Profile Photo</label>
+        <input type="file" name="profile_photo" id="photo-upload" accept="image/*">
+      </div>
+
+      <div class="rating-box">
+        <div class="rating-label">Your Rider Rating</div>
+        <div class="stars">★★★★☆ <span style="font-size: 14px; color: #555;">4.2 / 5</span></div>
+      </div>
+
+      <div>
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" value="{{ user.get_full_name }}" required>
+      </div>
+
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ user.email }}" required>
+      </div>
+
+      <div>
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" value="{{ user.profile.phone|default:'' }}">
+      </div>
+
+      <div>
+        <label for="city">City</label>
+        <input type="text" id="city" name="city" value="{{ user.profile.city|default:'' }}">
+      </div>
+
+      <button type="submit" class="save-btn">Save Changes</button>
+    </form>
+
+    <a href="{% url 'account-web' %}" class="back-link">← Back to Account</a>
+  </div>
+
+  <script>
+    // Trigger file input when label is clicked
+    document.querySelector('.change-photo').addEventListener('click', function () {
+      document.getElementById('photo-upload').click();
+    });
+  </script>
+</body>
+</html>

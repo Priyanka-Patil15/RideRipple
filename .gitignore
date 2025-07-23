@@ -1,0 +1,52 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+django_env/
+
+# Django SQLite DB and migrations
+*.sqlite3
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.pot
+*.mo
+
+# Local settings
+.env
+
+# Media/uploads
+/media/
+*.log
+
+# Django cache
+*.cache
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Node / frontend (if used)
+node_modules/
+build/
+dist/
+
+# Coverage / testing
+.coverage
+htmlcov/
+*.cover
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.tgz
+
+# Static files (optional if using collectstatic)
+staticfiles/

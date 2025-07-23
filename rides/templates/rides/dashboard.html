@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | RideRipple</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1a73e8;
+      --primary-dark: #0d47a1;
+      --primary-light: #e8f0fe;
+      --accent-color: #4caf50;
+      --white: #FFFFFF;
+      --gray-50: #F8F9FA;
+      --gray-100: #F1F3F4;
+      --gray-200: #E8EAED;
+      --gray-300: #DADCE0;
+      --gray-400: #BDC1C6;
+      --gray-500: #80868B;
+      --gray-700: #5F6368;
+      --gray-900: #202124;
+      --error-color: #d93025;
+      --success-color: #188038;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--gray-900);
+      height: 100vh;
+      line-height: 1.5;
+      background-color: var(--white);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 48px;
+      border-bottom: 1px solid var(--gray-200);
+      background-color: var(--white);
+      z-index: 100;
+    }
+    
+    .brand {
+      display: flex;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      margin-right: 40px;
+      color: var(--primary-color);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+    
+    .nav-link {
+      color: var(--gray-700);
+      text-decoration: none;
+      font-size: 16px;
+      cursor: pointer;
+      padding: 4px 0;
+      position: relative;
+    }
+    
+    .nav-link.active {
+      color: var(--primary-color);
+      font-weight: 500;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: -17px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: var(--primary-color);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+
+    .user-info-text {
+      margin-right: 16px;
+      text-align: right;
+    }
+
+    .username {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .current-time {
+      color: var(--gray-500);
+      font-size: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .user-menu {
+      position: absolute;
+      top: 70px;
+      right: 48px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 240px;
+      z-index: 1001;
+      display: none;
+      overflow: hidden;
+    }
+
+    .user-menu-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .user-menu-name {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .user-menu-email {
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+
+    .user-menu-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .user-menu-item:hover {
+      background-color: var(--gray-100);
+    }
+
+    .user-menu-item i {
+      margin-right: 12px;
+      color: var(--gray-700);
+      width: 20px;
+      text-align: center;
+    }
+
+    .main-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 69px);
+    }
+
+    .left-panel {
+      width: 450px;
+      padding: 32px;
+      height: 100%;
+      overflow-y: auto;
+      border-right: 1px solid var(--gray-200);
+    }
+
+    .greeting {
+      font-size: 20px;
+      margin-bottom: 24px;
+      color: var(--gray-700);
+    }
+
+    .title {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-container {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .location-input {
+      width: 100%;
+      padding: 14px 14px 14px 44px;
+      font-size: 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .location-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-700);
+      font-size: 16px;
+    }
+
+    .suggestions-container {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .current-location {
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--gray-200);
+      cursor: pointer;
+    }
+
+    .current-location:hover {
+      background-color: var(--gray-100);
+    }
+
+    .location-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      margin-right: 14px;
+      font-size: 14px;
+    }
+
+    .location-text {
+      flex: 1;
+    }
+
+    .location-title {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .location-subtitle {
+      font-size: 14px;
+      color: var(--gray-500);
+    }
+
+    .suggested-location {
+      padding: 14px;
+      display: flex;
+      border-bottom: 1px solid var(--gray-200);
+      cursor: pointer;
+    }
+
+    .suggested-location:hover {
+      background-color: var(--gray-100);
+    }
+
+    .pin-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 36px;
+      height: 36px;
+      color: var(--gray-700);
+      margin-right: 14px;
+      font-size: 16px;
+    }
+
+    .action-button {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary-color);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .map-container {
+      flex: 1;
+      height: 100%;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .ride-options {
+      margin-top: 32px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .option-card {
+      padding: 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-card:hover {
+      border-color: var(--primary-color);
+      background-color: var(--primary-light);
+    }
+
+    .option-card.active {
+      border-color: var(--primary-color);
+      background-color: var(--primary-light);
+    }
+
+    .option-icon {
+      margin-bottom: 8px;
+      font-size: 24px;
+      color: var(--gray-700);
+    }
+
+    .option-card.active .option-icon {
+      color: var(--primary-color);
+    }
+
+    .option-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .option-price {
+      margin-top: 4px;
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    .option-card.active .option-price {
+      color: var(--primary-color);
+    }
+
+    .saved-places {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--gray-200);
+    }
+
+    .saved-place {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+
+    .saved-place:hover {
+      background-color: var(--gray-100);
+    }
+
+    .saved-place-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--gray-200);
+      border-radius: 50%;
+      margin-right: 12px;
+      color: var(--gray-700);
+    }
+
+    .saved-place-text {
+      flex: 1;
+    }
+
+    .saved-place-name {
+      font-weight: 500;
+      margin-bottom: 2px;
+    }
+
+    .saved-place-address {
+      font-size: 13px;
+      color: var(--gray-500);
+    }
+
+    .module-links {
+      margin-top: 32px;
+    }
+
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .module-card {
+      padding: 16px;
+      border: 1px solid var(--gray-300);
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .module-card:hover {
+      border-color: var(--primary-color);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .module-icon {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .account-icon {
+      color: #e67e22;
+    }
+
+    .payment-icon {
+      color: #2ecc71;
+    }
+
+    .rides-icon {
+      color: #3498db;
+    }
+
+    .module-name {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    @media (max-width: 1024px) {
+      .main-container {
+        flex-direction: column;
+      }
+
+      .left-panel {
+        width: 100%;
+        height: 60%;
+      }
+
+      .map-container {
+        height: 40%;
+      }
+
+      .header {
+        padding: 16px 24px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+    .user-avatar {
+    z-index: 1100;
+    position: relative;
+  }
+
+  .user-menu {
+    z-index: 1101;
+  }
+
+  .map-container {
+    position: relative;
+    z-index: 1; /* Lower than avatar/menu */
+  }
+
+  #map {
+    pointer-events: auto;
+  }
+  </style>
+</head>
+<body>
+<header class="header">
+  <div class="brand">
+    <div class="logo">RideRipple</div>
+    <div class="nav-links">
+      <a href="#" class="nav-link active">Ride</a>
+      <a href="#" class="nav-link">Reserve</a>
+      <a href="#" class="nav-link">Explore</a>
+      <a href="#" class="nav-link">Airport</a>
+    </div>
+  </div>
+  <div class="user-info">
+    <div class="user-info-text">
+      <div class="username">{{ user.username }}</div>
+      <div class="current-time" id="current-time">2025-06-17 22:36:11</div>
+    </div>
+    <div class="user-avatar" id="user-avatar">
+      {% if profile and profile.photo and profile.photo.url and profile.photo.name != "default.png" %}
+        <img src="{{ profile.photo.url }}?v={{ timestamp }}" alt="Profile" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+      {% else %}
+        {{ user.first_name|default:user.username|slice:":1" }}{{ user.last_name|default:''|slice:":1" }}
+      {% endif %}
+    </div>
+    <div class="user-menu" id="user-menu" style="display: none;">
+      <div class="user-menu-header">
+        <div class="user-menu-name">
+          {{ user.get_full_name|default:user.username }}
+        </div>
+        <div class="user-menu-email">
+          {{ user.email|default:"user@example.com" }}
+        </div>
+      </div>
+      <div class="user-menu-item" id="account-menu-item">
+        <i class="fas fa-user"></i> Account
+      </div>
+      <div class="user-menu-item" id="payment-menu-item">
+        <i class="fas fa-credit-card"></i> Payment Methods
+      </div>
+      <div class="user-menu-item" id="rides-menu-item">
+        <i class="fas fa-history"></i> Ride History
+      </div>
+      <div class="user-menu-item">
+        <i class="fas fa-cog"></i> Settings
+      </div>
+      <div class="user-menu-item">
+        <i class="fas fa-question-circle"></i> Help
+      </div>
+      <div class="user-menu-item" id="logout-button">
+        <i class="fas fa-sign-out-alt"></i> Log out
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="main-container">
+  <div class="left-panel">
+    <div class="greeting">
+      Hello, {{ user.first_name|default:user.username }}
+    </div>
+    <h1 class="title">Where to?</h1>
+
+    <div class="form-group">
+      <div class="input-container">
+        <input type="text" id="pickup" class="location-input" placeholder="Pickup location" autocomplete="off" value="Current location">
+        <div class="input-icon">
+          <i class="fas fa-circle" style="color: var(--primary-color); font-size: 12px;"></i>
+        </div>
+      </div>
+
+      <div id="pickup-suggestions" class="suggestions-container" style="display: none;">
+        <div class="current-location" id="use-current-location">
+          <div class="location-icon">
+            <i class="fas fa-location-arrow"></i>
+          </div>
+          <div class="location-text">
+            <div class="location-title">Current location</div>
+            <div class="location-subtitle">Using GPS</div>
+          </div>
+        </div>
+
+        <div class="suggested-location">
+          <div class="pin-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="location-text">
+            <div class="location-title">2321 John F Kennedy Blvd</div>
+            <div class="location-subtitle">North Bergen, NJ</div>
+          </div>
+        </div>
+
+        <div class="suggested-location">
+          <div class="pin-icon">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="location-text">
+            <div class="location-title">2506 Cottage Ave</div>
+            <div class="location-subtitle">North Bergen, NJ</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="input-container">
+        <input type="text" id="dropoff" class="location-input" placeholder="Enter destination" autocomplete="off">
+        <div class="input-icon">
+          <i class="fas fa-square" style="font-size: 12px;"></i>
+        </div>
+      </div>
+
+      <div id="dropoff-suggestions" class="suggestions-container" style="display: none;">
+        <!-- Dropoff suggestions will be populated here -->
+      </div>
+    </div>
+
+    <div class="ride-options">
+      <h3 class="section-title">Choose a ride</h3>
+      <div class="options-grid">
+        <div class="option-card active">
+          <div class="option-icon">
+            <i class="fas fa-car"></i>
+          </div>
+          <div class="option-name">Economy</div>
+          <div class="option-price">$24.50</div>
+        </div>
+        <div class="option-card">
+          <div class="option-icon">
+            <i class="fas fa-car-side"></i>
+          </div>
+          <div class="option-name">Comfort</div>
+          <div class="option-price">$32.75</div>
+        </div>
+        <div class="option-card">
+          <div class="option-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="option-name">Group</div>
+          <div class="option-price">$36.90</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="action-button">Request ride</button>
+    <!-- Payment Modal -->
+    <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); z-index:1000;">
+      <div style="background:white; padding:24px; max-width:400px; margin:100px auto; border-radius:12px; text-align:center;">
+        <h3>Choose Payment Method</h3>
+        <form action="{% url 'wallet_payment' %}" method="POST" style="margin-bottom: 12px;">
+          {% csrf_token %}
+          <input type="hidden" name="ride_id" value="{{ ride.id }}">
+          <button type="submit" style="background-color:#1a73e8; color:white; padding:10px 20px; border:none; border-radius:8px;">Pay with Wallet</button>
+        </form>
+        <form action="{% url 'stripe_payment' %}" method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="ride_id" value="{{ ride.id }}">
+          <button type="submit" style="background-color:#34a853; color:white; padding:10px 20px; border:none; border-radius:8px;">Pay with Stripe</button>
+        </form>
+        <button onclick="closePaymentModal()" style="margin-top: 16px; background:none; border:none; color:#555;">Cancel</button>
+      </div>
+    </div>
+    <div class="saved-places">
+      <h3 class="section-title">Saved places</h3>
+
+      <div class="saved-place">
+        <div class="saved-place-icon">
+          <i class="fas fa-home"></i>
+        </div>
+        <div class="saved-place-text">
+          <div class="saved-place-name">Home</div>
+          <div class="saved-place-address">123 Main Street, Anytown, USA</div>
+        </div>
+      </div>
+
+      <div class="saved-place">
+        <div class="saved-place-icon">
+          <i class="fas fa-briefcase"></i>
+        </div>
+        <div class="saved-place-text">
+          <div class="saved-place-name">Work</div>
+          <div class="saved-place-address">456 Business Ave, Downtown, USA</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="module-links">
+      <h3 class="section-title">Quick access</h3>
+      <div class="module-grid">
+        <div class="module-card" id="account-module">
+          <div class="module-icon account-icon">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="module-name">Account</div>
+        </div>
+        <div class="module-card" id="payment-module">
+          <div class="module-icon payment-icon">
+            <i class="fas fa-wallet"></i>
+          </div>
+          <div class="module-name">Payment</div>
+        </div>
+        <div class="module-card" id="rides-module">
+          <div class="module-icon rides-icon">
+            <i class="fas fa-car"></i>
+          </div>
+          <div class="module-name">Rides</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="map-container">
+    <div id="map"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Update current time
+  function updateTime() {
+    const now = new Date();
+    const timeString = now.toISOString().slice(0, 19).replace('T', ' ');
+    document.getElementById('current-time').textContent = timeString;
+  }
+
+  // Update time initially and then every minute
+  updateTime();
+  setInterval(updateTime, 60000);
+
+  // Initialize map
+  const map = L.map('map', {
+    zoomControl: false
+  }).setView([40.7930, -74.0300], 14); // North Bergen, NJ coordinates
+
+  // Use a cleaner map style
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(map);
+
+  // Add zoom controls to bottom right
+  L.control.zoom({
+    position: 'bottomright'
+  }).addTo(map);
+
+  // Variables for markers
+  let pickupMarker, dropoffMarker, routeLine;
+
+  // Custom marker icons
+  const pickupIcon = L.divIcon({
+    html: '<i class="fas fa-circle" style="color:#1a73e8;font-size:12px;"></i>',
+    className: 'custom-div-icon',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+
+  const dropoffIcon = L.divIcon({
+    html: '<i class="fas fa-square" style="color:#000;font-size:12px;"></i>',
+    className: 'custom-div-icon',
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+
+  // Set default pickup marker (current location)
+  // In a real app, you'd use geolocation to get the exact coordinates
+  pickupMarker = L.marker([40.7930, -74.0300], {icon: pickupIcon}).addTo(map);
+  map.setView([40.7930, -74.0300], 15);
+
+  // Show/hide suggestions
+  const pickupInput = document.getElementById('pickup');
+  const dropoffInput = document.getElementById('dropoff');
+  const pickupSuggestions = document.getElementById('pickup-suggestions');
+  const dropoffSuggestions = document.getElementById('dropoff-suggestions');
+
+  // Show pickup suggestions on focus
+  pickupInput.addEventListener('focus', () => {
+    pickupSuggestions.style.display = 'block';
+  });
+
+  // Show dropoff suggestions on focus
+  dropoffInput.addEventListener('focus', () => {
+    // Generate and populate dropoff suggestions
+    populateDropoffSuggestions();
+    dropoffSuggestions.style.display = 'block';
+  });
+
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!pickupInput.contains(e.target) && !pickupSuggestions.contains(e.target)) {
+      pickupSuggestions.style.display = 'none';
+    }
+    if (!dropoffInput.contains(e.target) && !dropoffSuggestions.contains(e.target)) {
+      dropoffSuggestions.style.display = 'none';
+    }
+  });
+
+  // Handle current location
+  document.getElementById('use-current-location').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      // Set a marker on the map
+      if (pickupMarker) {
+        map.removeLayer(pickupMarker);
+      }
+
+      pickupMarker = L.marker([lat, lng], {icon: pickupIcon}).addTo(map);
+      map.setView([lat, lng], 15);
+
+      // Update input and hide suggestions
+      pickupInput.value = 'Current location';
+      pickupSuggestions.style.display = 'none';
+    }, () => {
+      alert('Unable to retrieve your location');
+    });
+  });
+
+  // Handle suggested locations
+  const suggestedLocations = document.querySelectorAll('.suggested-location');
+  suggestedLocations.forEach(location => {
+    location.addEventListener('click', () => {
+      const locationTitle = location.querySelector('.location-title').textContent;
+      const locationSubtitle = location.querySelector('.location-subtitle').textContent;
+
+      // Get coordinates (for the demo, using North Bergen coordinates with slight variations)
+      const baseLat = 40.7930;
+      const baseLng = -74.0300;
+      const randomLat = baseLat + (Math.random() * 0.01 - 0.005);
+      const randomLng = baseLng + (Math.random() * 0.01 - 0.005);
+
+      // Set a marker on the map
+      if (pickupMarker) {
+        map.removeLayer(pickupMarker);
+      }
+
+      pickupMarker = L.marker([randomLat, randomLng], {icon: pickupIcon}).addTo(map);
+      map.setView([randomLat, randomLng], 15);
+
+      // Update input and hide suggestions
+      pickupInput.value = locationTitle + ', ' + locationSubtitle;
+      pickupSuggestions.style.display = 'none';
+    });
+  });
+
+  // Populate dropoff suggestions
+  function populateDropoffSuggestions() {
+    const suggestions = [
+      {
+        title: 'Times Square',
+        subtitle: 'Manhattan, New York, NY',
+        lat: 40.7580,
+        lng: -73.9855
+      },
+      {
+        title: 'Empire State Building',
+        subtitle: 'Manhattan, New York, NY',
+        lat: 40.7484,
+        lng: -73.9857
+      },
+      {
+        title: 'Central Park',
+        subtitle: 'Manhattan, New York, NY',
+        lat: 40.7812,
+        lng: -73.9665
+      }
+    ];
+
+    // Clear existing suggestions
+    dropoffSuggestions.innerHTML = '';
+
+    // Add suggestions
+    suggestions.forEach(suggestion => {
+      const item = document.createElement('div');
+      item.className = 'suggested-location';
+      item.innerHTML = `
+        <div class="pin-icon">
+          <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="location-text">
+          <div class="location-title">${suggestion.title}</div>
+          <div class="location-subtitle">${suggestion.subtitle}</div>
+        </div>
+      `;
+      item.addEventListener('click', () => {
+        // Set a marker on the map
+        if (dropoffMarker) {
+          map.removeLayer(dropoffMarker);
+        }
+
+        dropoffMarker = L.marker([suggestion.lat, suggestion.lng], {icon: dropoffIcon}).addTo(map);
+
+        // Update input and hide suggestions
+        dropoffInput.value = `${suggestion.title}, ${suggestion.subtitle}`;
+        dropoffSuggestions.style.display = 'none';
+
+        // Draw route
+        drawRoute();
+      });
+      dropoffSuggestions.appendChild(item);
+    });
+  }
+
+  // Function to draw a route between pickup and dropoff
+  function drawRoute() {
+    if (pickupMarker && dropoffMarker) {
+      // Remove existing route
+      if (routeLine) {
+        map.removeLayer(routeLine);
+      }
+
+      // Get coordinates
+      const start = pickupMarker.getLatLng();
+      const end = dropoffMarker.getLatLng();
+
+      // Create a simple line for the route
+      routeLine = L.polyline([
+        [start.lat, start.lng],
+        [end.lat, end.lng]
+      ], {
+        color: '#1a73e8',
+        weight: 4,
+        opacity: 0.8,
+        lineJoin: 'round'
+      }).addTo(map);
+
+      // Fit map to show the entire route
+      const bounds = L.latLngBounds([start, end]);
+      map.fitBounds(bounds, {
+        padding: [50, 50]
+      });
+    }
+  }
+
+  // User menu toggle
+  const userAvatar = document.getElementById('user-avatar');
+  const userMenu = document.getElementById('user-menu');
+
+  userAvatar.addEventListener('click', (e) => {
+    e.stopPropagation();  // Prevents the document click from immediately hiding it
+    userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Close user menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!userAvatar.contains(e.target) && !userMenu.contains(e.target)) {
+      userMenu.style.display = 'none';
+    }
+  });
+  const logoutBtn = document.getElementById('logout-button');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      window.location.href = "{% url 'logout' %}";
+    });
+  }
+  // Ride option selection
+  const rideOptions = document.querySelectorAll('.option-card');
+  rideOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      rideOptions.forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+
+      // Update button text
+      const rideName = option.querySelector('.option-name').textContent;
+      document.querySelector('.action-button').textContent = `Request ${rideName}`;
+    });
+  });
+
+  // Saved places handling
+  const savedPlaces = document.querySelectorAll('.saved-place');
+  savedPlaces.forEach(place => {
+    place.addEventListener('click', () => {
+      const placeName = place.querySelector('.saved-place-name').textContent;
+      const placeAddress = place.querySelector('.saved-place-address').textContent;
+
+      // Set as destination
+      dropoffInput.value = placeAddress;
+
+      // Get coordinates (for the demo, using variations)
+      const baseLat = 40.7930;
+      const baseLng = -74.0300;
+      const randomLat = baseLat + (Math.random() * 0.02 - 0.01);
+      const randomLng = baseLng + (Math.random() * 0.02 - 0.01);
+
+      // Set a marker on the map
+      if (dropoffMarker) {
+        map.removeLayer(dropoffMarker);
+      }
+
+      dropoffMarker = L.marker([randomLat, randomLng], {icon: dropoffIcon}).addTo(map);
+
+      // Draw route
+      drawRoute();
+    });
+  });
+  function openPaymentModal() {
+    document.getElementById('paymentModal').style.display = 'block';
+  }
+
+  function closePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+  }
+
+  document.getElementById('payment-module').addEventListener('click', () => {
+    window.location.href = "{% url 'payment_index' %}";
+  });
+
+  document.getElementById('rides-module').addEventListener('click', () => {
+    window.location.href = "{% url 'ride-history' %}";
+  });
+
+  // User menu links
+  document.getElementById('account-menu-item').addEventListener('click', () => {
+    window.location.href = "{% url 'account-web' %}";
+  });
+
+  document.getElementById('payment-menu-item').addEventListener('click', () => {
+    window.location.href = "{% url 'payment_index' %}";
+  });
+
+  document.getElementById('rides-menu-item').addEventListener('click', () => {
+    window.location.href = "{% url 'ride-history' %}";
+  });
+
+  // Logout functionality
+  document.getElementById('logout-button').addEventListener('click', () => {
+    window.location.href = "{% url 'logout' %}";
+  });
+
+  document.querySelector('.action-button').addEventListener('click', () => {
+    const pickup = pickupInput.value;
+    const dropoff = dropoffInput.value;
+    const rideType = document.querySelector('.option-card.active .option-name').textContent;
+
+    if (!dropoff) {
+      alert('Please enter a destination');
+      return;
+    }
+
+    fetch('/rides/book/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCSRFToken()
+      },
+      body: JSON.stringify({
+        pickup: pickup,
+        dropoff: dropoff,
+        ride_type: rideType
+      })
+    })
+    .then(response => {
+      if (response.ok) {
+        window.location.href = "/rides/confirmed/";
+      } else {
+        alert('Error booking ride. Please log in.');
+      }
+    });
+  });
+
+  // Helper to get CSRF token from cookies
+  function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        return decodeURIComponent(cookie.split('=')[1]);
+      }
+    }
+    return '';
+  }
+</script>
+</body>
+</html>
