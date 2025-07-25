@@ -533,7 +533,7 @@
     <div class="logo">RideRipple</div>
     <div class="nav-links">
       <a href="#" class="nav-link active">Ride</a>
-      <a href="#" class="nav-link">Reserve</a>
+      <a href="#" class="nav-link" id="reserveNavLink">Reserve</a>
       <a href="#" class="nav-link">Explore</a>
       <a href="#" class="nav-link">Airport</a>
     </div>
@@ -567,6 +567,9 @@
       </div>
       <div class="user-menu-item" id="rides-menu-item">
         <i class="fas fa-history"></i> Ride History
+      </div>
+      <div class="user-menu-item" onclick="window.location.href='{% url 'reserved_rides' %}'">
+        <i class="fas fa-clock"></i> My Reserved Rides
       </div>
       <div class="user-menu-item">
         <i class="fas fa-cog"></i> Settings
@@ -670,6 +673,7 @@
     </div>
 
     <button class="action-button">Request ride</button>
+
     <!-- Payment Modal -->
     <div id="paymentModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); z-index:1000;">
       <div style="background:white; padding:24px; max-width:400px; margin:100px auto; border-radius:12px; text-align:center;">
@@ -733,6 +737,26 @@
           <div class="module-name">Rides</div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Reserve Modal -->
+  <div id="reserveModal" class="hidden" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); z-index:1000;">
+    <div style="background:white; padding:24px; max-width:400px; margin:100px auto; border-radius:12px; text-align:center;">
+      <h3>Reserve a Ride</h3>
+      <p>Choose your time, location, and preferences.</p>
+
+      <form method="POST" action="{% url 'schedule_ride' %}">
+        {% csrf_token %}
+        <label for="scheduled_date">Date:</label>
+        <input type="date" name="scheduled_date" required style="margin-bottom: 12px; display: block; width: 100%;">
+
+        <label for="scheduled_time">Time:</label>
+        <input type="time" name="scheduled_time" required style="margin-bottom: 12px; display: block; width: 100%;">
+
+        <button type="submit" style="background-color:#1a73e8; color:white; padding:10px 20px; border:none; border-radius:8px;">Schedule Ride</button>
+      </form>
+      <button id="closeModal" style="margin-top: 16px; background:none; border:none; color:#555;">Cancel</button>
     </div>
   </div>
 
@@ -1041,6 +1065,10 @@
     window.location.href = "{% url 'ride-history' %}";
   });
 
+  document.getElementById('rides-module').addEventListener('click', () => {
+    window.location.href = "{% url 'schedule_ride' %}";
+  });
+
   // User menu links
   document.getElementById('account-menu-item').addEventListener('click', () => {
     window.location.href = "{% url 'account-web' %}";
@@ -1102,6 +1130,64 @@
     }
     return '';
   }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const reserveNavLink = document.getElementById('reserveNavLink'); // <a> in nav
+    const reserveModal = document.getElementById('reserveModal');     // Modal div
+    const closeModalBtn = document.getElementById('closeModal');      // "Cancel" button
+
+    if (reserveNavLink && reserveModal && closeModalBtn) {
+      reserveNavLink.addEventListener("click", function (e) {
+        e.preventDefault(); // stop link jump
+        console.log("Opening modal...");  // ✅ shows in console
+        reserveModal.classList.remove("hidden"); // show the modal
+      });
+
+      closeModalBtn.addEventListener("click", function () {
+        reserveModal.classList.add("hidden"); // hide it again
+      });
+    }
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const reserveNavLink = document.getElementById('reserveNavLink');
+  const reserveMenuItem = document.getElementById('reserve-menu-item');
+  const reserveModal = document.getElementById('reserveModal');
+  const closeModalBtn = document.getElementById('closeModal');
+
+  function openModal() {
+    if (reserveModal) {
+      reserveModal.style.display = 'block';
+    }
+  }
+
+  function closeModal() {
+    if (reserveModal) {
+      reserveModal.style.display = 'none';
+    }
+  }
+
+  if (reserveNavLink) {
+    reserveNavLink.addEventListener("click", function (e) {
+      e.preventDefault();
+      openModal();
+    });
+  }
+
+  if (reserveMenuItem) {
+    reserveMenuItem.addEventListener("click", function (e) {
+      e.preventDefault();
+      openModal();
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener("click", function () {
+      closeModal();
+    });
+  }
+});
 </script>
 </body>
 </html>

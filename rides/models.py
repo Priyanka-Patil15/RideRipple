@@ -19,6 +19,7 @@ class Ride(models.Model):
     pickup_lng = models.FloatField(null=True, blank=True)
     dropoff_lat = models.FloatField(null=True, blank=True)
     dropoff_lng = models.FloatField(null=True, blank=True)
+    is_scheduled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.pickup} to {self.dropoff} ({self.ride_type})"

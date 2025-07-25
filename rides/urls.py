@@ -14,4 +14,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('rides/confirmed/', views.ride_confirmed, name='ride-confirmed'),
     path('rides/track/<int:ride_id>/', views.track_ride, name='track-ride'),
+    path('schedule-ride/', views.schedule_ride, name='schedule_ride'),
+    path('reserved-rides/', views.reserved_rides, name='reserved_rides'),
 ]

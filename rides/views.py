@@ -89,3 +89,27 @@ def track_ride(request, ride_id):
     ride = get_object_or_404(Ride, id=ride_id, user=request.user)
     return render(request, 'rides/track.html', {'ride': ride})
 
+
+@login_required
+def schedule_ride(request):
+    if request.method == 'POST':
+        scheduled_date = request.POST.get('scheduled_date')
+        scheduled_time = request.POST.get('scheduled_time')
+
+        Ride.objects.create(
+            user=request.user,
+            pickup="Scheduled Ride",
+            dropoff="Scheduled Ride",
+            ride_type="UberX",
+            date=scheduled_date,
+            time=scheduled_time,
+            is_scheduled=True
+        )
+
+        return redirect('home')
+
+
+@login_required
+def reserved_rides(request):
+    rides = Ride.objects.filter(user=request.user, is_scheduled=True).order_by('-date', '-time')
+    return render(request, 'rides/reserved_rides.html', {'rides': rides})

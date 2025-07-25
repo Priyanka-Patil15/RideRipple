@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reserved Rides</title>
+</head>
+<body>
+  <h2>Your Reserved Rides</h2>
+  {% if rides %}
+    <ul>
+      {% for ride in rides %}
+        <li>
+          {{ ride.date }} at {{ ride.time }} — {{ ride.pickup }} ➡ {{ ride.dropoff }} ({{ ride.ride_type }})
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No reserved rides yet.</p>
+  {% endif %}
+  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+</body>
+</html>
