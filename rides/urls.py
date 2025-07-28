@@ -16,4 +16,9 @@ urlpatterns = [
     path('rides/track/<int:ride_id>/', views.track_ride, name='track-ride'),
     path('schedule-ride/', views.schedule_ride, name='schedule_ride'),
     path('reserved-rides/', views.reserved_rides, name='reserved_rides'),
+    path('api/help-ai/', views.help_ai_view, name='help_ai'),
+    path('shared/create/', views.create_shared_ride, name='create_shared_ride'),
+    path('shared/<int:ride_id>/', views.shared_ride_detail, name='shared_ride_detail'),
+    path('shared/', views.my_shared_rides, name='my_shared_rides'),
+    path('rides/<int:ride_id>/respond/', views.respond_to_invite, name='respond_to_invite'),
 ]

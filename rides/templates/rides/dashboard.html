@@ -535,7 +535,7 @@
       <a href="#" class="nav-link active">Ride</a>
       <a href="#" class="nav-link" id="reserveNavLink">Reserve</a>
       <a href="#" class="nav-link">Explore</a>
-      <a href="#" class="nav-link">Airport</a>
+      <a href="{% url 'create_shared_ride' %}" class="nav-link">Shared Ride</a>
     </div>
   </div>
   <div class="user-info">
@@ -571,10 +571,13 @@
       <div class="user-menu-item" onclick="window.location.href='{% url 'reserved_rides' %}'">
         <i class="fas fa-clock"></i> My Reserved Rides
       </div>
+      <div class="user-menu-item" onclick="window.location.href='{% url 'my_shared_rides' %}'">
+        <i class="fas fa-users"></i> My Shared Rides
+      </div>
       <div class="user-menu-item">
         <i class="fas fa-cog"></i> Settings
       </div>
-      <div class="user-menu-item">
+      <div class="user-menu-item" id="help-menu-item">
         <i class="fas fa-question-circle"></i> Help
       </div>
       <div class="user-menu-item" id="logout-button">
@@ -763,7 +766,16 @@
   <div class="map-container">
     <div id="map"></div>
   </div>
-</div>
+  <!-- Help Chat Modal -->
+  <div id="helpChatModal" style="display:none; position:fixed; bottom:20px; right:20px; width:320px; max-height:500px; background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.2); z-index:1100; overflow:hidden; display:flex; flex-direction:column;">
+    <div style="padding:12px 16px; background:var(--primary-color); color:#fff; font-weight:500;">Need Help?</div>
+    <div id="chatMessages" style="flex:1; padding:12px; overflow-y:auto; font-size:14px;"></div>
+    <div style="display:flex; border-top:1px solid #eee;">
+      <input type="text" id="chatInput" placeholder="Ask a question..." style="flex:1; padding:10px; border:none; outline:none; font-size:14px;">
+      <button id="chatSendBtn" style="padding:0 16px; background:var(--primary-color); border:none; color:#fff; cursor:pointer;">Send</button>
+    </div>
+  </div>
+  </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
@@ -1186,6 +1198,68 @@ document.addEventListener("DOMContentLoaded", function () {
     closeModalBtn.addEventListener("click", function () {
       closeModal();
     });
+  }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const helpBtn = document.getElementById('help-menu-item');
+  const chatModal = document.getElementById('helpChatModal');
+  const chatInput = document.getElementById('chatInput');
+  const chatSendBtn = document.getElementById('chatSendBtn');
+  const chatMessages = document.getElementById('chatMessages');
+
+  helpBtn.addEventListener("click", function () {
+    chatModal.style.display = chatModal.style.display === 'none' ? 'flex' : 'none';
+  });
+
+  chatSendBtn.addEventListener("click", async function () {
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return;
+
+    const userMsgEl = document.createElement("div");
+    userMsgEl.style.margin = "8px 0";
+    userMsgEl.innerHTML = `<strong>You:</strong> ${userMessage}`;
+    chatMessages.appendChild(userMsgEl);
+    chatInput.value = "";
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const response = await fetch('/api/help-ai/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCSRFToken()
+        },
+        body: JSON.stringify({ message: userMessage })
+      });
+
+      const data = await response.json();
+      const aiMessage = data.reply || "Sorry, I didn't understand that.";
+
+      const aiMsgEl = document.createElement("div");
+      aiMsgEl.style.margin = "8px 0";
+      aiMsgEl.innerHTML = `<strong>AI:</strong> ${aiMessage}`;
+      chatMessages.appendChild(aiMsgEl);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    } catch (err) {
+      const errorMsg = document.createElement("div");
+      errorMsg.style.color = 'red';
+      errorMsg.textContent = "Failed to get response. Try again later.";
+      chatMessages.appendChild(errorMsg);
+    }
+  });
+
+  function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+      if (cookie.startsWith(name + '=')) {
+        return decodeURIComponent(cookie.split('=')[1]);
+      }
+    }
+    return '';
   }
 });
 </script>

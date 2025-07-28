@@ -9,6 +9,23 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
+import os
+import openai
+import google.generativeai as genai
+import requests
+from dotenv import load_dotenv
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponseForbidden
+from .models import SharedRide, SharedRideInvite, check_ride_status
+from django.contrib.auth.models import User
+from django.utils.dateparse import parse_datetime
+from .models import ChatMessage
+
+load_dotenv()
+
+
+# openai.api_key = os.getenv("openai_key")
+genai.configure(api_key=os.getenv("gemini_key"))
 
 
 @login_required(login_url='/login/')
@@ -107,9 +124,126 @@ def schedule_ride(request):
         )
 
         return redirect('home')
+    return render(request, 'rides/schedule_ride.html')
 
 
 @login_required
 def reserved_rides(request):
     rides = Ride.objects.filter(user=request.user, is_scheduled=True).order_by('-date', '-time')
     return render(request, 'rides/reserved_rides.html', {'rides': rides})
+
+
+@csrf_exempt
+def help_ai_view(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user_message = data.get("message")
+
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": "mistral",
+                    "prompt": user_message,
+                    "stream": False
+                }
+            )
+            result = response.json()
+            reply = result.get("response", "Sorry, I didn't get that.")
+
+            return JsonResponse({"reply": reply})
+
+        except Exception as e:
+            print(f"❌ Ollama error: {e}")
+            return JsonResponse({"reply": "There was an error with the AI."}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+@login_required
+def create_shared_ride(request):
+    if request.method == 'POST':
+        pickup = request.POST.get('pickup')
+        dropoff = request.POST.get('dropoff')
+        scheduled_time_str = request.POST.get('scheduled_time')
+        friend_ids = request.POST.getlist('friends')  # list of user IDs
+
+        # Convert datetime string to object
+        scheduled_time = parse_datetime(scheduled_time_str)
+
+        ride = SharedRide.objects.create(
+            organizer=request.user,
+            pickup=pickup,
+            dropoff=dropoff,
+            scheduled_time=scheduled_time
+        )
+
+        for friend_id in friend_ids:
+            user = User.objects.get(id=friend_id)
+            SharedRideInvite.objects.create(ride=ride, invitee=user)
+
+        return redirect('shared_ride_detail', ride.id)
+
+    # Show form
+    friends = User.objects.exclude(id=request.user.id)
+    return render(request, 'rides/create_shared_ride.html', {'friends': friends})
+
+
+@login_required
+def shared_ride_detail(request, ride_id):
+    ride = get_object_or_404(SharedRide, id=ride_id)
+
+    # Access control
+    is_invited = ride.invites.filter(invitee=request.user).exists()
+    if request.user != ride.organizer and not is_invited:
+        return HttpResponseForbidden("You're not allowed to view this ride.")
+
+    # Handle Accept/Decline
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        invite = ride.invites.get(invitee=request.user)
+        if action == 'accept':
+            invite.accepted = True
+        elif action == 'decline':
+            invite.accepted = False
+        invite.save()
+        return redirect('shared_ride_detail', ride_id=ride.id)
+
+    # Fetch chat history
+    chat_messages = ChatMessage.objects.filter(ride=ride).select_related('sender')
+
+    return render(
+        request,
+        'rides/shared_ride_detail.html',
+        {
+            'ride': ride,
+            'chat_messages': chat_messages
+        }
+    )
+
+def respond_to_invite(request, ride_id):
+    ride = get_object_or_404(SharedRide, id=ride_id)
+    invite = ride.invites.get(invitee=request.user)
+
+    action = request.POST.get("action")
+    if action == "accept":
+        invite.accepted = True
+    elif action == "decline":
+        invite.accepted = False
+    invite.save()
+
+    # Check ride status after updating
+    check_ride_status(ride)
+
+    return redirect("shared_ride_detail", ride_id=ride.id)
+
+
+@login_required
+def my_shared_rides(request):
+    organized = SharedRide.objects.filter(organizer=request.user)
+    invited = SharedRide.objects.filter(invites__invitee=request.user)
+
+    return render(request, 'rides/my_shared_rides.html', {
+        'organized_rides': organized,
+        'invited_rides': invited
+    })

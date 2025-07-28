@@ -1,0 +1,26 @@
+<h2>Create a Shared Ride</h2>
+
+<form method="POST">
+  {% csrf_token %}
+
+  <label>Pickup Location:</label>
+  <input type="text" name="pickup" required><br><br>
+
+  <label>Dropoff Location:</label>
+  <input type="text" name="dropoff" required><br><br>
+
+  <label>Scheduled Time:</label>
+  <input type="datetime-local" name="scheduled_time" required><br><br>
+
+  <h2>Invite Friends</h2>
+  {% if friends %}
+    {% for friend in friends %}
+      <input type="checkbox" name="friends" value="{{ friend.id }}"> {{ friend.username }}<br>
+    {% endfor %}
+  {% else %}
+    <p>No friends to invite.</p>
+  {% endif %}
+
+  <br>
+  <button type="submit">Create Shared Ride</button>
+</form>

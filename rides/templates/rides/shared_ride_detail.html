@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Shared Ride Detail</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f0f0f0;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 { color: #1a73e8; margin-bottom: 16px; }
+    h2 { margin-top: 24px; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 12px; }
+    form button {
+      margin-left: 8px;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    form button[name="action"][value="accept"] {
+      background-color: #1a73e8;
+      color: white;
+    }
+    form button[name="action"][value="decline"] {
+      background-color: #ddd;
+      color: #333;
+    }
+    .back {
+      display: inline-block;
+      margin-top: 20px;
+      background: #1a73e8;
+      color: white;
+      padding: 10px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    .chat-container {
+      margin-top: 30px;
+      border-top: 1px solid #ddd;
+      padding-top: 20px;
+    }
+    #chat-box {
+      height: 200px;
+      overflow-y: auto;
+      background: #f1f3f4;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    #chat-input {
+      width: 80%;
+      padding: 8px;
+      margin-top: 10px;
+    }
+    #send-btn {
+      padding: 8px 12px;
+      margin-left: 6px;
+      background: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Shared Ride Created by {{ ride.organizer.username }}</h1>
+
+    <p><strong>Pickup:</strong> {{ ride.pickup }}</p>
+    <p><strong>Dropoff:</strong> {{ ride.dropoff }}</p>
+    <p><strong>Scheduled Time:</strong> {{ ride.scheduled_time }}</p>
+
+    <h2>Invited Friends</h2>
+    {% if ride.invites.all %}
+      <ul>
+        {% for invite in ride.invites.all %}
+          <li>
+            {{ invite.invitee.username }} –
+            {% if invite.accepted == True %}
+              ✅ Accepted
+            {% elif invite.accepted == False %}
+              ❌ Declined
+            {% elif invite.invitee == request.user %}
+              <form method="POST" action="{% url 'respond_to_invite' ride.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" name="action" value="accept">Accept</button>
+                <button type="submit" name="action" value="decline">Decline</button>
+              </form>
+            {% else %}
+              ⏳ Pending
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No friends invited yet.</p>
+    {% endif %}
+
+    <!-- Chat Section -->
+    <div class="chat-container">
+      <h2>Ride Chat</h2>
+      <div id="chat-box">
+        {% for msg in chat_messages %}
+          <div>{{ msg.sender.username }}: {{ msg.content }}</div>
+        {% endfor %}
+      </div>
+      <div>
+        <input type="text" id="chat-input" placeholder="Type a message...">
+        <button id="send-btn">Send</button>
+      </div>
+    </div>
+
+    <!-- Fixed back link -->
+    <a href="{% url 'my_shared_rides' %}" class="back">← Back to Shared Rides</a>
+  </div>
+
+  <script>
+    // WebSocket for chat
+    const rideId = "{{ ride.id }}";
+    const chatSocket = new WebSocket(
+      (window.location.protocol === "https:" ? "wss://" : "ws://") +
+      window.location.host +
+      "/ws/ride/" + rideId + "/"
+    );
+
+    chatSocket.onmessage = function(e) {
+      const data = JSON.parse(e.data);
+      const chatBox = document.getElementById("chat-box");
+      const msg = document.createElement("div");
+      msg.textContent = `${data.username}: ${data.message}`;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+
+    document.getElementById("send-btn").onclick = function() {
+      const input = document.getElementById("chat-input");
+      if (input.value.trim() !== "") {
+        chatSocket.send(JSON.stringify({ "message": input.value }));
+        input.value = "";
+      }
+    };
+  </script>
+</body>
+</html>

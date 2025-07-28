@@ -270,19 +270,10 @@
   border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 ">
-  <div style="font-size: 20px; font-weight: 600;">
-    RideRipple
-  </div>
-  <a href="{% url 'home' %}" style="
-    background-color: white;
-    color: #4a6eff;
-    padding: 10px 18px;
-    font-weight: 500;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-  " onmouseover="this.style.backgroundColor='#f0f4ff'" onmouseout="this.style.backgroundColor='white'">
-    ← Back to Dashboard
+  <a href="{% url 'home' %}" style="text-decoration: none; color: inherit;">
+    <div style="font-size: 20px; font-weight: 600;">
+      RideRipple
+    </div>
   </a>
 </nav>
 <div class="container">
