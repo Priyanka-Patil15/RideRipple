@@ -45,4 +45,7 @@ python manage.py runserver
 
 **Author**
 
-Priyanka PatilFeature branch: AI Help Chat
+Priyanka Patil
+Feature branch: Dashboard UI improvements
+Feature branch: Payment integration
+
