@@ -45,4 +45,6 @@ python manage.py runserver
 
 **Author**
 
-Priyanka PatilFeature branch: Dashboard UI improvements
+Priyanka Patil
+Feature branch: Dashboard UI improvements
+Feature branch: Payment integration
