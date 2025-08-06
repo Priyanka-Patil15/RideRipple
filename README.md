@@ -31,7 +31,9 @@ cd RideRipple
 ### 2. Create a virtual environment
 
 ```bash
+
 python -m venv virtualEnv
+
 source virtualEnv/bin/activate  # Windows: django_env\Scripts\activate
 ```
 
@@ -47,12 +49,19 @@ Create a `.env` file in your root directory and add:
 
 ```
 SECRET_KEY=your_django_secret_key
+
 DEBUG=True
+
 DATABASE_NAME=your_db_name
+
 DATABASE_USER=your_db_user
+
 DATABASE_PASSWORD=your_db_password
+
 EMAIL_HOST_USER=you@example.com
+
 EMAIL_HOST_PASSWORD=your_password
+
 STRIPE_SECRET_KEY=your_stripe_secret
 ```
 
@@ -60,6 +69,7 @@ STRIPE_SECRET_KEY=your_stripe_secret
 
 ```bash
 python manage.py makemigrations
+
 python manage.py migrate
 ```
 
@@ -134,4 +144,3 @@ Test coverage includes:
 This project was developed as part of the **CISC 594 – Software Testing Principles & Techniques** course at Harrisburg University.
 
 ---
-
