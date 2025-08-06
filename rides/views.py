@@ -155,7 +155,10 @@ def help_ai_view(request):
 
         except Exception as e:
             print(f"❌ Ollama error: {e}")
-            return JsonResponse({"reply": "There was an error with the AI."}, status=500)
+            return JsonResponse({
+                "reply": "There was an error with the AI.Our Agent will be connecting to this chat to help shortly!.."},
+                status=500
+            )
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -183,7 +186,6 @@ def create_shared_ride(request):
             SharedRideInvite.objects.create(ride=ride, invitee=user)
 
         return redirect('shared_ride_detail', ride.id)
-
     # Show form
     friends = User.objects.exclude(id=request.user.id)
     return render(request, 'rides/create_shared_ride.html', {'friends': friends})

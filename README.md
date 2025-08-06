@@ -1,50 +1,137 @@
-# RideSafe
+# 🚗 RideRipple – Community Ride-Sharing Web Application
 
-RideSafe is a safety-focused ride-sharing application inspired by Uber and Lyft, with a unique feature that allows users to **share rides with friends** and **chat with co-passengers in real time**.
+[Live Repo 🔗](https://github.com/Priyanka-Patil15/RideRipple)
 
----
-
-## Key Features
-
-- **Friend Ride Sharing:** Invite friends to join your ride when heading in the same direction.
-- **In-App Chat:** Communicate securely with co-passengers during your trip.
-- **Enhanced Safety:** Live location sharing, SOS button, and verified driver profiles.
-- **Cost Splitting:** Automatically split fares when sharing rides.
+**RideRipple** is a secure, community-based ride-sharing platform designed for short-distance travel. Built with Django and Leaflet.js, the system supports Riders, Drivers, and Admins with features like interactive maps, shared ride invitations, Stripe payments, and email alerts.
 
 ---
 
-## Why RideSafe?
+## 🛠️ Tech Stack
 
-Unlike traditional ride-hailing apps, RideSafe focuses on **safety, community, and cost efficiency**.  
-No more solo rides when you can travel safer and cheaper with trusted friends.
-
----
-
-## Tech Stack
-
-- **Backend:** Django / Django REST Framework
-- **Frontend:** HTML, CSS, JavaScript
-- **Database:** PostgreSQL
-- **Hosting:** AWS / Heroku (planned)
+- **Backend**: Django (ASGI-compatible)
+- **Frontend**: Django templates + Bootstrap + Leaflet.js (OpenStreetMap)
+- **Database**: PostgreSQL
+- **ASGI Server**: Daphne
+- **Email**: SMTP (for bookings, cancellations, and reminders)
+- **Payment Gateway**: Stripe
+- **Testing**: pytest, pytest-django
+- **Version Control**: GitHub
 
 ---
 
-## Getting Started
+## 📦 Setup Instructions
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Priyanka9496/RideSafe.git
+### 1. Clone the repository
 
-Navigate to the project folder and set up your environment.
+```bash
+git clone https://github.com/Priyanka-Patil15/RideRipple.git
+cd RideRipple
+```
 
-Start the development server:
+### 2. Create a virtual environment
 
+```bash
+python -m venv virtualEnv
+source virtualEnv/bin/activate  # Windows: django_env\Scripts\activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+
+Create a `.env` file in your root directory and add:
+
+```
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+DATABASE_NAME=your_db_name
+DATABASE_USER=your_db_user
+DATABASE_PASSWORD=your_db_password
+EMAIL_HOST_USER=you@example.com
+EMAIL_HOST_PASSWORD=your_password
+STRIPE_SECRET_KEY=your_stripe_secret
+```
+
+### 5. Migrate Database
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### 6. Create Superuser
+
+```bash
+python manage.py createsuperuser
+```
+
+---
+
+## 🚀 Running the App
+
+To run using **Daphne** (ASGI server):
+
+```bash
+daphne RideSafe.asgi:application
+```
+
+For development (optional):
+
+```bash
 python manage.py runserver
+```
 
+Access: [http://localhost:8000](http://localhost:8000)
 
+---
 
-**Author**
+## 🔐 Authentication Roles
 
-Priyanka Patil
-Feature branch: Dashboard UI improvements
-Feature branch: Payment integration
+- **Rider**: Book/manage rides, receive notifications  
+- **Driver**: Post rides, view requests  
+- **Admin**: Monitor activity, access analytics dashboard
+
+---
+
+## ✨ Key Features
+
+- ✅ **Secure Login** – Role-based access for Riders, Drivers, and Admins  
+- 🗺️ **Map-based Booking** – Book rides using Leaflet.js and OpenStreetMap  
+- 🧑‍🤝‍🧑 **Shared Rides with Friends** –  
+  Riders can invite friends to share rides. Invited users must have a profile to accept or decline invitations.  
+  Shared rides include:
+  - Invitation management  
+  - Real-time chat between riders  
+  - Visibility restricted to authorized participants  
+- 💳 **Stripe Integration** – Secure online payments  
+- 📊 **Admin Dashboard** – Analytics and moderation tools for platform admins  
+- 🤖 **AI Help Chat** – External AI integration for user support  
+- 📱 **Mobile Responsive** – Works smoothly across devices
+
+---
+
+## 🧪 Testing
+
+Run all tests:
+
+```bash
+pytest
+```
+
+Test coverage includes:
+- Unit Tests (Models, Views, Payment Logic)
+- System Tests (Booking workflows)
+- Negative Tests (Unauthorized access, invalid data)
+
+---
+
+## 🧾 License
+
+This project was developed as part of the **CISC 594 – Software Testing Principles & Techniques** course at Harrisburg University.
+
+---
+

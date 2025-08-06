@@ -1,26 +1,64 @@
-<h2>Create a Shared Ride</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create Shared Ride</title>
 
-<form method="POST">
-  {% csrf_token %}
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-  <label>Pickup Location:</label>
-  <input type="text" name="pickup" required><br><br>
+  <style>
+    body {
+      background: #f0f2f5;
+      font-family: Arial, sans-serif;
+    }
 
-  <label>Dropoff Location:</label>
-  <input type="text" name="dropoff" required><br><br>
+    h2, h4 {
+      color: #5a189a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container my-5">
+    <h2 class="mb-4">Create a Shared Ride</h2>
 
-  <label>Scheduled Time:</label>
-  <input type="datetime-local" name="scheduled_time" required><br><br>
+    <form method="post">
+      {% csrf_token %}
 
-  <h2>Invite Friends</h2>
-  {% if friends %}
-    {% for friend in friends %}
-      <input type="checkbox" name="friends" value="{{ friend.id }}"> {{ friend.username }}<br>
-    {% endfor %}
-  {% else %}
-    <p>No friends to invite.</p>
-  {% endif %}
+      <div class="mb-3">
+        <label for="pickup" class="form-label">Pickup Location:</label>
+        <input type="text" class="form-control" id="pickup" name="pickup" placeholder="Enter pickup location" required>
+      </div>
 
-  <br>
-  <button type="submit">Create Shared Ride</button>
-</form>
+      <div class="mb-3">
+        <label for="dropoff" class="form-label">Dropoff Location:</label>
+        <input type="text" class="form-control" id="dropoff" name="dropoff" placeholder="Enter dropoff location" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="scheduled_time" class="form-label">Scheduled Time:</label>
+        <input type="datetime-local" class="form-control" id="scheduled_time" name="scheduled_time" required>
+      </div>
+
+      <h4>Invite Friends</h4>
+      {% if friends %}
+        {% for friend in friends %}
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="friend{{ friend.id }}" name="friends" value="{{ friend.id }}">
+            <label class="form-check-label" for="friend{{ friend.id }}">{{ friend.username }}</label>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No friends to invite.</p>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary mt-4">Create Shared Ride</button>
+    </form>
+  </div>
+
+  <!-- Bootstrap JS Bundle (Optional, needed for some components) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+</body>
+</html>
