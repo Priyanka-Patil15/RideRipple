@@ -53,9 +53,9 @@
 
   <div class="container">
     <h2>Select a Payment Method</h2>
-
+    <p>Pickup: {{ ride.pickup }}</p>
     <div class="payment-option">
-      <form method="POST" action="{% url 'wallet-payment' %}">
+      <form method="POST" action="{% url 'wallet_payment' %}">
         {% csrf_token %}
         <input type="hidden" name="ride_id" value="{{ ride.id }}">
         <button type="submit">Pay with Wallet</button>
@@ -63,7 +63,7 @@
     </div>
 
     <div class="payment-option">
-      <form method="GET" action="{% url 'checkout' %}">
+      <form method="GET" action="{% url 'stripe_payment' %}">
         <button type="submit">Pay with Stripe</button>
       </form>
     </div>

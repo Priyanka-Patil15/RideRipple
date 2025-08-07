@@ -75,11 +75,17 @@ def ride_history(request):
 
 @csrf_exempt
 def book_ride(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     if request.method == 'POST':
         data = json.loads(request.body)
         pickup = data.get('pickup')
         dropoff = data.get('dropoff')
         ride_type = data.get('ride_type')
+
+        if not (pickup and dropoff and ride_type):
+            return JsonResponse({'error': 'Missing required fields'}, status=400)
 
         if request.user.is_authenticated:
             Ride.objects.create(
